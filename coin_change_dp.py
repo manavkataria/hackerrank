@@ -17,19 +17,20 @@ class CoinChange(object):
         self.denominations = denominations
 
     def reset_cache(self):
-        self.cache = [inf] * self.amount  # NOTE: Important to Initialize Cache
+        self.cache = [inf] * (self.amount+1)  # NOTE: Important to Initialize Cache (remember +1)
         self.cache[0] = 0
 
     def find_min_path(self, residual_amount):
         self.reset_cache()
 
-        minlen = self.find_min_len_of_path(residual_amount)
+        # minlen = self.find_min_len_of_path(residual_amount)
+        minlen = self.find_min_len_of_path_iter(residual_amount)
         path = self.find_path()
         print 'Path:', path
         return minlen
 
     def find_path(self):
-        i = self.amount-1
+        i = self.amount
         stack = list()
 
         while (i>0):
@@ -63,26 +64,29 @@ class CoinChange(object):
 
         return self.cache[residual_amount]
 
-    # def find_min_len_of_path_iter(self, residual_amount):
-    #     if residual_amount < 0:
-    #         return inf
-    #
-    #     if self.cache[residual_amount] == inf:
-    #         if residual_amount in self.denominations:
-    #             self.cache[residual_amount] = 1
-    #         else:
-    #             min_len = inf
-    #             for d in self.denominations:
-    #                 path_len = self.find_min_len_of_path(residual_amount - d) + 1
-    #                 if path_len < min_len:
-    #                     min_len = path_len
-    #             self.cache[residual_amount] = min_len
-    #
-    #     return self.cache[residual_amount]
+    def find_min_len_of_path_iter(self, residual_amount):
+        if residual_amount < 0:
+            return inf
+
+        end = residual_amount
+
+        for residual_amount in range(end+1):
+            if self.cache[residual_amount] == inf:
+                if residual_amount in self.denominations:
+                    self.cache[residual_amount] = 1
+                else:
+                    min_len = inf
+                    for d in self.denominations:
+                        path_len = self.cache[residual_amount - d] + 1
+                        if path_len < min_len:
+                            min_len = path_len
+                    self.cache[residual_amount] = min_len
+
+        return self.cache[end]
 
 
 def main():
-    cc = CoinChange(amount+1, denominations)
+    cc = CoinChange(amount, denominations)
     cc.find_min_path(amount)
     # for i in range(amount+1):
     #     print 'Amount: %d -> Coins: %0.0f' % (i, cc.find_min_path(i))
