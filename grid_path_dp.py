@@ -10,8 +10,14 @@ class Point(object):
     def __repr__(self):
         return '(%d, %d)' % (self.x, self.y)
 
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __ne__(self, other):
+        return self.x != other.x or self.y != other.y
+
 initialized = [
-    [0, 8, 8, 1],
+    [1, 8, 8, 1],
     [4, 8, 5, 1],
     [8, 4, 5, 4],
     [8, 1, 9, 8]
@@ -54,8 +60,9 @@ class Grid(object):
         if 0 <= pt.x < self.cols and 0 <= pt.y < self.rows:
             return self.grid[pt.y][pt.x]
         else:
-            import ipdb; ipdb.set_trace()
-            raise IndexError
+            return 0
+            # NOTE: Exceptions interfere with the iterative solution
+            # raise IndexError
 
     def __setitem__(self, pt, value):
         if 0 <= pt.x < self.cols and 0 <= pt.y < self.rows:
@@ -66,7 +73,31 @@ class Grid(object):
     def find_best_path(self, start, end):
         cache = Grid(self.cols, self.rows, initialize_with=-1)
         current = Point(end.x, end.y)
-        return self.grid_path(current, start, cache)
+        # val = self.grid_path(current, start, cache)  # DP
+        val = self.grid_path_iterative(current, start, cache)
+        path = self.extract_best_path(current, start, cache)
+
+        return val, path
+
+    def extract_best_path(self, current, start, cache):
+        stack = list()
+        stack.append(current)
+
+        while (current != start):
+            print 'Stack:', stack
+            print 'Current:', current
+
+            left = Point(current.x-1, current.y)
+            up = Point(current.x, current.y-1)
+
+            if cache[left] > cache[up]:
+                stack.append(left)
+                current = left
+            else:
+                stack.append(up)
+                current = up
+
+        return stack[::-1]
 
     def grid_path(self, current, start, cache):
         # NOTE: state has cache.
@@ -85,18 +116,48 @@ class Grid(object):
 
             # Base
             if current.x == start.x and current.y == start.y:
-                return self[current]
+                cache[current] = self[current]
+            else:
+                # Transition
+                left = Point(current.x-1, current.y)
+                up = Point(current.x, current.y-1)
 
-            # Transition
-            left = Point(current.x-1, current.y)
-            up = Point(current.x, current.y-1)
-
-            # Update Cache + Min/Max Transition
-            cache[current] = self[current] + max(
-                self.grid_path(left, start, cache),
-                self.grid_path(up, start, cache))
+                # Update Cache + Min/Max Transition
+                cache[current] = self[current] + max(
+                    self.grid_path(left, start, cache),
+                    self.grid_path(up, start, cache)
+                )
 
         return cache[current]
+
+    def grid_path_iterative(self, end, start, cache):
+        # Storage is Row Major order; Thus row computation is inside
+        # Cache Hit optimization
+        for x in range(self.cols):
+            for y in range(self.rows):
+                current = Point(x,y)
+
+                if current.x < 0 or current.y < 0:
+                    return 0
+
+                print 'Current: (%d,%d) [%d]' % (current.x, current.y, self[current])
+
+                # Base
+                if current.x == start.x and current.y == start.y:
+                    cache[current] = self[current]
+                else:
+                    # Transition
+                    left = Point(current.x-1, current.y)
+                    up = Point(current.x, current.y-1)
+
+                    # Update Cache + Min/Max Transition
+                    cache[current] = self[current] + max(
+                        cache[left],
+                        cache[up]
+                    )
+
+        return cache[end]
+
 
     def grid_path_recursion(self, current, start):
         print 'Current: (%d,%d) [%d]' % (current.x, current.y, self[current])
@@ -113,15 +174,15 @@ class Grid(object):
         )
 
 
-
 def main():
     grid = Grid(copy_from=initialized)
     start = Point(0,0)
     end = Point(grid.cols-1, grid.rows-1)
-    cost = grid.find_best_path(start, end)
+    cost, path = grid.find_best_path(start, end)
 
-    print 'Original:', grid
+    print 'Grid:', grid
     print 'Cost:', cost
+    print 'Path:', path
 
 if __name__ == '__main__':
     main()
