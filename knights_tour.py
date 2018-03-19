@@ -67,6 +67,10 @@ def knights_tour_recursive(graph, cur, end):
     return 1 + minpathlen
 
 def knights_tour_iterative(graph, cur, end, start=None):
+    """
+    NOTE: This is a BFS solution. Hence it looks a little different from
+    a DP up solution which is a reverse DFS approach.
+    """
     rows = len(graph)
     cols = len(graph[0])
 
