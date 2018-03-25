@@ -8,7 +8,7 @@ grid = ["+B...",
         "##@##"
         ]
 
-expected_output_len = 21
+expected_output_len = 17
 
 class Point(object):
     def __init__(self, x, y):
@@ -189,3 +189,14 @@ def find_shortest_path(grid):
     #     f.write(outstr)
 
     return []
+
+def main():
+    if grid is not None:
+        find_shortest_path(grid)
+    else:
+        pass
+        # Define Grid for command line access
+
+
+if __name__ == '__main__':
+    main()
