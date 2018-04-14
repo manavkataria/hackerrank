@@ -66,7 +66,7 @@ def find_first_diff_char(str1, str2):
 def find_order(words):
     graph = Graph()
 
-    # If only one word in dict
+    # Corner Case: If only one word in dict
     if len(set(words)) == 1:
         return words[0][0]
 
@@ -80,6 +80,9 @@ def find_order(words):
         if c1 is not None:
             print('Add Dep:', c1, '->', c2)
             graph.add_dep(c1, c2)
+        else:
+            # Corner Case: ['i', 'id'] but d -> i
+            pass
 
         prev = word
 
