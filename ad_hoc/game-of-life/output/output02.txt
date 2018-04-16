@@ -1,0 +1,4 @@
+Case #1: alive
+Case #2: alive
+Case #3: alive
+Case #4: dead
