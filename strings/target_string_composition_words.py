@@ -7,11 +7,8 @@ Given a set of strings, e.g. {'one', 'cat', 'two', 'four'}, and a target string,
 from the set.
 
 'fouroneone' -> true
-
 'onecat' -> true
-
 'fouron' -> false
-
 'twone' -> false
 
 '''
@@ -24,83 +21,76 @@ from the set.
 
 # TODO:
 # 1. Corner / Edge Cases
-    # Empty Target; Need two?
+    # Empty Target
     # Empty Word
     # Empty words set
-# 2. Dry Run
-# 3. Use set instead of queue
+# 2. Dry Run (done)
+# 3. Use set instead of queue (done)
 
 # NOTE: Feedback
 # Ask clarifying questions even thought the inputs are present; Do not assume that to be typical
-# Possible to do target prefix lookup into words instead of for word in target
+# Possible to do target prefix lookup into words instead of looking up each word in target
 # DFS/BFS Revise
 # Complexity analysis practice more
 
 '''
-T = len(target)
-W = len(words)
-n = len(max-len-word)
-
-5 {a aa aaa aaaa aaaaa}
-aaaaaab 7
-
-7
+Degenerate Case:
+    5 {a aa aaa aaaa aaaaa}
+    aaaaaab 7
 '''
 
 
 words = {'one', 'ca', 'cat', 'two', 'fo', 'four'}
-target = 'onecat'
+targets = ['onecat', 'fouroneone', 'fouron', 'twone', '']
+expected = [True, True, False, False, False]
 
 def find_concatenated_match(words, target):
+    """
+        Time Complexity: O(T.W.n)
+        T = len(target)
+        W = len(words)
+        n = len(max-wordlen)
+
+        Space Complexity: O(W)
+    """
+
     # Assume True; arbitrary choice
     if len(words) == 0:
         return True
 
-    queue = [target]
+    queue = set([target])
 
     # 2 & 4 Repeat for all target candidates O(T)
     while len(queue) > 0:
         target = queue.pop()
 
-        # 4 Repeat for one candidate O(T)
-        while (target != ''):
-            foundPrefix = False
+        # 1 Prefix match every word O(W.n)
+        for word in words:
+            n = len(word)
 
-            # 1 Prefix match every word O(W.n)
-            for word in words:
-                n = len(word)
+            if n == 0:
+                return True
 
-                if n == 0:
+            print ('Target:', target, 'Word:', word)
+
+            if word == target[:n]:
+                # 3 Trim Target, and
+                # 2 Add back to queue; Multiple Matches
+                queue.add(target[n:])
+
+                # Check for perfect match
+                if target[n:] == '':
                     return True
 
-                print ('Target:', target, 'Word:', word)
-
-                if word == target[:n]:
-                    # 3 Trim Target
-                    # target = target[n:]
-
-                    # 2 Add back to queue; Multiple Matches
-                    # queue.append(target)
-                    queue.append(target[n:])
-                    foundPrefix = True
-                    # break
-
-            # Try next target candidate; FIXME: Unnecessary?
-            if foundPrefix == False:
-                break
-            else:
-                # Found a prefix Match
-                pass
-
-        if target == '':
-            break
-            # Found Perfect Match
-        else:
-            pass
-            # Try next candidate
+    return False
 
 
-    return foundPrefix
+def main():
+    for target, expect in zip(targets, expected):
+        found = find_concatenated_match(words, target)
+        print 'Target:', target, '| Found:', found, '\n'
+        assert found == expect
 
 
-print find_concatenated_match(words, target)
+if __name__ == '__main__':
+    main()
