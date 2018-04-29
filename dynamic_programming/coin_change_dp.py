@@ -25,11 +25,11 @@ class CoinChange(object):
 
         # minlen = self.find_min_len_of_path(residual_amount)
         minlen = self.find_min_len_of_path_iter(residual_amount)
-        path = self.find_path()
+        path = self.find_path_bfs()
         print 'Path:', path
         return minlen
 
-    def find_path(self):
+    def find_path_bfs(self):
         i = self.amount
         stack = list()
 

@@ -23,7 +23,6 @@ initialized = [
     [8, 1, 9, 8]
 ]
 
-
 # initialized = [
 #     [1, 2],
 #     [3, 4]
