@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 
-def explore_all_neighbors(z, i, visited, count):
+def explore_all_neighbors(z, i):
     """
     Visits all neighbours and marks them as visited (resets) their connection
     Returns: Boolean if atleast 1 neighbour found apart from self
@@ -9,7 +9,7 @@ def explore_all_neighbors(z, i, visited, count):
 
     n = len(z)
     q = [i]
-    found = set()
+    found = False
     while len(q) > 0:
         i = q.pop()
 
@@ -18,8 +18,9 @@ def explore_all_neighbors(z, i, visited, count):
             if z[i][j] == 1:  # Reset All Neighbours
                 z[i][j] = 0
                 z[j][i] = 0
-                found.add(j)
-                q.append(j)
+                found = True
+                if i != j:
+                    q.append(j)
 
     return found
 
@@ -29,13 +30,13 @@ def zombieCluster(zombies):
     z = [[1 if v == '1' else 0 for v in row] for row in zombies]
 
     # print 'Z', z
-    count = 0
+    count = n
     visited = set()
     for i in range(n):
         if i not in visited:
-            found = explore_all_neighbors(z, i, visited, count)
-            visited = visited.union(found)
-            count += 1
+            found = explore_all_neighbors(z, i)
+            if not found:
+                count -= 1
 
     return count
 
