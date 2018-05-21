@@ -136,3 +136,32 @@ if __name__ == '__main__':
 
     f.write(str(res) + "\n")
     f.close()
+
+
+# BFS
+def find_minimum_number_of_moves_rev1(rows, cols, start_row, start_col, end_row, end_col):
+
+    q = [(start_row, start_col, 0)]  # Note the Trick. Push length into the queue
+    v = set()
+    v.add((start_row, start_col))
+
+    count = -1
+    while q:
+        r,c,l = q.pop(0)  # Remember to use pop(ZER0)
+
+        if not(0 <= r < rows and 0 <= c < cols):
+            continue
+
+        if (r, c) == (end_row, end_col):
+            count = l
+            break
+
+        for dr, dc in delta:
+            nr = dr + r
+            nc = dc + c
+
+            if (nr, nc) not in v:
+                v.add((nr, nc))
+                q.append((nr, nc, l+1))
+
+    return count
