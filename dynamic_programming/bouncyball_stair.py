@@ -76,7 +76,7 @@ def bouncyball_stair_dpslow(N, b):
     + Change `n` -> `N` in function(parameters)
     + Change `return` -> `continue`
     + Add 2D Bottom-up loops for DP:
-        + NOTE: Go full length x full width, ie;
+        + NOTE: Go full length x full width, if basecase/initialization is inside ie;
         + Add n loop range(N)
         + Add b loop range(N)
     + Keep i-loop for computing each cell (already there)
@@ -84,15 +84,17 @@ def bouncyball_stair_dpslow(N, b):
 
     for n in range(N+1):
         for b in range(1, N+1):
+
+            # Base Case / Initialization
             if n == 0:
                 memo[(n,b)] = 1
                 continue
-                # return memo[(n,b)]
 
             count = 0
             for i in range(b, n+1):
                 count += memo.get((n-i, i), 0)
 
+            # Save
             memo[(n,b)] = count
 
     return memo[(N, 1)]
@@ -128,11 +130,12 @@ def bouncyball_dpfast_n2(N):
     Time Complexity: O(N^2)
     Space Complexity: O(2 * N^2)
     """
-    # NOTE: Additional Base for DP
-    if N==1:
+
+    # Additional Base for DP
+    if N == 1:
         return 1
 
-    # Save tuple: (f-value, My UpperRight Diagonal Sum, _excluding me_)
+    # Save tuple: (Count-Value, Upperright Diagonal-Sum, _excluding itself_)
     table = [[(None, None)]*(N+1) for _ in range(N+1)]
 
     # Init the base case _outside_ (NOTE) the DP loops
@@ -140,25 +143,29 @@ def bouncyball_dpfast_n2(N):
         table[0][b] = (1, 0)
 
     for n in range(1, N+1):
-        # Run DP for the entire table. No exceptions.
-        # NOTE: This is counter intuitive as the memoization->dp didn't need this and n^3 solution didn't need this.
-        for b in range(1, N+1):
-            # Add additional constraints for fv logic. But keep that independent of DP loop range
-            if b <= n:
-                # f-value: upper-fv + upper-ds
-                fv = table[n-b][b][0] + table[n-b][b][1]
 
-                # Diag Sum; Additional Constraint
+        # Run DP for the entire table range(N+1).
+        # This is counter intuitive as the memoization->dp didn't need this, had range(n)
+        # Also, n^3 solution also didn't need this.
+        for b in range(1, N+1):
+
+            # Add additional constraints for cv computation logic.
+            # But keep that independent of DP loop range
+            if b <= n:
+                # count-value: upper-cv + upper-ds
+                cv = table[n-b][b][0] + table[n-b][b][1]
+
+                # Diagonal Sum; Additional constraint on b+1
                 if b+1 <= N:
                     ds = table[n-1][b+1][0] + table[n-1][b+1][1]
                 else:
                     ds = 1
             else:
-                fv = 0
+                cv = 0
                 ds = 1
 
             # Save Tuple
-            table[n][b] = (fv, ds)
+            table[n][b] = (cv, ds)
 
     return table[N][1][0]
 
