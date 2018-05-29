@@ -6,6 +6,29 @@
 """
 Problem: Count the number of combinations that a bouncy ball takes to hit nth stair.
 Constraint: Once it takes a bounce of size b, it has to take a bounce of size b or greater.
+
+Test:
+
+    n = 4 | Result = 5
+    [
+        [1, 1, 1, 1],
+        [1, 1, 2],
+        [1, 3],
+        [2, 2],
+        [4]
+    ]
+
+    n = 5 | Result = 7
+    [
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 2],
+        [1, 2, 2],
+        [1, 1, 3],
+        [1, 4],
+        [2, 3],
+        [5]
+    ]
+
 """
 
 
@@ -46,45 +69,36 @@ def bouncyball_stair_memo(n, b):
         return memo[(n,b)]
 
 
-memo = dict()
-def bouncyball_stair_dp(N, b):
+def bouncyball_stair_dpslow(N, b):
     """
     Memo -> DP:
     + Remove recursion;
-    + Go Bottom-up
     + Change `n` -> `N` in function(parameters)
-    + Add n loop range(N)
-    + Add b loop (already there)
-    + Kill returns
+    + Change `return` -> `continue`
+    + Add 2D Bottom-up loops for DP:
+        + NOTE: Go full length x full width, ie;
+        + Add n loop range(N)
+        + Add b loop range(N)
+    + Keep i-loop for computing each cell (already there)
     """
 
-    for i in range(N+1):
-        memo[(0, i)] = 1
-
-    for n in range(N):
-        if (n,b) not in memo:
-            # Guard
-            if n < 0:
-                memo[(n,b)] = 0
-
-            # NOTE: a base case of n == 1 is a trap!!
+    for n in range(N+1):
+        for b in range(1, N+1):
             if n == 0:
                 memo[(n,b)] = 1
+                continue
                 # return memo[(n,b)]
 
             count = 0
             for i in range(b, n+1):
-                count += memo[(n-i, i)]
+                count += memo.get((n-i, i), 0)
 
             memo[(n,b)] = count
-            # return memo[(n,b)]
-        # else:
-            # return memo[(n,b)]
 
-    return memo[(n,1)]
+    return memo[(N, 1)]
 
 
-def bounchball_dpfast_n3(N):
+def bouncyball_dpfast_n3(N):
     """
     Use DP table to store number_of_stars and size_of_bounce: (N x B)
     For every cell, it takes O(N) lookups to compute its value.
@@ -103,13 +117,10 @@ def bounchball_dpfast_n3(N):
             for i in range(b,n+1):
                 table[n][b] += table[n-i][i]
 
-    # Print Table
-    for i, row in enumerate(table):
-        print str(i)+':', row
     return table[n][1]
 
 
-def bounchball_dpfast_n2(N):
+def bouncyball_dpfast_n2(N):
     """
     Use additional space to save diagnoal sum and avoid recomputation
     For every cell, now it takes O(1) lookup to compute its value.
@@ -149,39 +160,19 @@ def bounchball_dpfast_n2(N):
             # Save Tuple
             table[n][b] = (fv, ds)
 
-    # Print Table
-    print_table(table)
-
     return table[N][1][0]
 
 
-# print bounchball_dpfast_n2(9)
+def main():
+    for i in range(1, 10):
 
-for i in range(2, 10):
-    result = bounchball_dpfast_n2(i)
-    print 'DP:', 'N:', i, 'Count:', result
+        # result = bouncyball_stair(i, 1)  # Done
+        # result = bouncyball_stair_memo(i, 1)  # Done
+        # result = bouncyball_stair_dpslow(i, 1)  # Done
+        # result = bouncyball_dpfast_n3(i)  # Done
+        result = bouncyball_dpfast_n2(i)  # Done
+        print 'N:', i, '| Count:', result
 
 
-"""
-Test:
-
-n = 4
-[
-    [1, 1, 1, 1],
-    [1, 1, 2],
-    [1, 3],
-    [2, 2],
-    [4]
-]
-
-n = 5
-[
-    [1, 1, 1, 1, 1],
-    [1, 1, 1, 2],
-    [1, 2, 2],
-    [1, 1, 3],
-    [1, 4],
-    [2, 3],
-    [5]
-]
-"""
+if __name__ == '__main__':
+    main()
